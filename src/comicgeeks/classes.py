@@ -553,7 +553,7 @@ class Issue:
         self._variant_covers = None
 
     @property
-    def characters(self) -> list[dict]:
+    def characters(self) -> list:
         """List of characters that appear in this issue"""
         if self._characters is None:
             self._get_data()
@@ -684,7 +684,7 @@ class Issue:
         self._number = value
 
     @property
-    def person_credits(self) -> list[dict]:
+    def person_credits(self) -> list:
         """List of people that create this issue"""
         if self._person_credits is None:
             self._get_data()
@@ -748,7 +748,7 @@ class Issue:
         self._url = value
 
     @property
-    def variant_covers(self) -> list[dict]:
+    def variant_covers(self) -> list:
         """List of variant covers"""
         if self._variant_covers is None:
             self._get_data()
