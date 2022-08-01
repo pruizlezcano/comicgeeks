@@ -32,7 +32,7 @@ class Comic_Geeks:
             return ci_session
         return ""
 
-    def search_series(self, query: str) -> list[Series]:
+    def search_series(self, query: str) -> list:
         """Search series by name
 
         Args:
@@ -53,7 +53,7 @@ class Comic_Geeks:
         data = get_series(comics, Series, self._ci_session)
         return data
 
-    def new_releases(self) -> list[Issue]:
+    def new_releases(self) -> list:
         """Get this week new releases
 
         Returns:
