@@ -8,8 +8,8 @@
 # serve to show the default.
 
 import os
-import sys
 import shutil
+import sys
 
 # -- Path setup --------------------------------------------------------------
 
@@ -52,7 +52,7 @@ try:
 
     apidoc.main(args)
 except Exception as e:
-    print("Running `sphinx-apidoc` failed!\n{}".format(e))
+    print(f"Running `sphinx-apidoc` failed!\n{e}")
 
 # -- General configuration ---------------------------------------------------
 
@@ -72,6 +72,7 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "revitron_sphinx_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -106,7 +107,11 @@ master_doc = "index"
 
 # General information about the project.
 project = "comicgeeks"
-copyright = "2022, Pablo"
+version = "0.1.0"
+release = "0.1.0"
+author = "Pablo Ruiz"
+copyright = '2022 <a href="https://github.com/pruizlezcano">Pablo Ruiz</a>'
+language = "en"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -116,10 +121,14 @@ copyright = "2022, Pablo"
 # release: The full version, including alpha/beta/rc tags.
 # If you don’t need the separation provided between version and release,
 # just set them both to the same value.
+
 try:
     from comicgeeks import __version__ as version
+
+    version = version.__version__
 except ImportError:
     version = ""
+
 
 if not version or version.lower() == "unknown":
     version = os.getenv("READTHEDOCS_VERSION", "unknown")  # automatically set by RTD
@@ -171,14 +180,25 @@ todo_emit_warnings = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "alabaster"
+html_theme = "revitron_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    "sidebar_width": "300px",
-    "page_width": "1200px"
+    "navigation_depth": 2,
+    "github_url": "https://github.com/pruizlezcano/comicgeeks",
+    "color_scheme": "blue",
+}
+
+html_context = {
+    "landing_page": {
+        "menu": [
+            {"title": "Docs", "url": "get-started.html"},
+            {"title": "GitHub", "url": "https://github.com/pruizlezcano/comicgeeks"},
+            {"title": "♡ Sponsor", "url": "#"},
+        ]
+    }
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -191,9 +211,8 @@ html_theme_options = {
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
 
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-# html_logo = ""
+# The name of an image file (relative to this directory)
+html_logo = "_static/icon.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -248,6 +267,11 @@ html_static_path = ["_static"]
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "comicgeeks-doc"
+
+
+def setup(app):
+    app.add_css_file("css/custom.css")
+    app.add_js_file("custom.js")
 
 
 # -- Options for LaTeX output ------------------------------------------------

@@ -1,0 +1,8 @@
+[flake8]
+max-line-length = 120
+extend-ignore = E501
+per-file-ignores =
+	docs/conf.py:A001
+	src/comicgeeks/__init__.py:F401
+	src/comicgeeks/extract.py:E722,E800,A002
+	setup.py:ENC001,T201

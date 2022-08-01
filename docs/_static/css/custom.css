@@ -1,0 +1,33 @@
+html.blue {
+	--hue: 215;
+	--sat: 65%;
+
+	--bg: hsl(var(--hue), var(--sat), 11%);
+	--bg-nav: var(--bg);
+	--bg-nav-current: hsl(var(--hue), var(--sat), 26%);
+	--bg-nav-current-list: hsl(var(--hue), var(--sat), 17%);
+	--bg-nav-hover: hsl(var(--hue), var(--sat), 20%);
+	--bg-code: hsl(var(--hue), var(--sat), 17%);
+	--bg-code-highlight: hsl(var(--hue), var(--sat), 21%);
+	--bg-panel: var(--bg-code);
+
+	--text: hsl(var(--hue), var(--sat), 94%);
+	--link: inherit;
+	--nav: hsl(var(--hue), var(--sat), 72%);
+	--code: hsl(var(--hue), var(--sat), 86%);
+	--headline: var(--text);
+	--nav-current: var(--text);
+
+	--border: hsl(var(--hue), var(--sat), 20%);
+	--muted: hsl(var(--hue), var(--sat), 58%);
+	--info-text: var(--text);
+	--info-bg: hsl(var(--hue), var(--sat), 26%);
+	--danger-text: hsl(4, 80%, 74%);
+	--danger-bg: hsl(4, 12%, 19%);
+	--warning-text: hsl(50, 70%, 74%);
+	--warning-bg: hsl(50, 10%, 18%);
+
+	--bg-highlight: hsl(212, 60%, 45%);
+
+	--font-weight-factor: 0.95;
+}

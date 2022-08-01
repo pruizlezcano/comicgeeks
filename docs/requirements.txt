@@ -1,6 +1,10 @@
+beautifulsoup4>=4.11.1
+lxml>=4.9.1
 # Requirements file for ReadTheDocs, check .readthedocs.yml.
 # To build the module reference correctly, make sure every external package
 # under `install_requires` in `setup.cfg` is also listed here!
 # sphinx_rtd_theme
 myst-parser[linkify]
+requests>=2.28.1
+git+https://github.com/revitron/revitron-sphinx-theme.git#egg=revitron-sphinx-theme
 sphinx>=3.2.1
