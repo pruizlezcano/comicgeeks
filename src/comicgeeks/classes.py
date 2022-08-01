@@ -1288,7 +1288,7 @@ class Character:
         return self._image
 
     @property
-    def creators(self) -> list[Creator]:
+    def creators(self) -> list:
         """Character creators"""
         if self._creators is None:
             self._get_data()
@@ -1309,14 +1309,14 @@ class Character:
         return self._information
 
     @property
-    def also_known_as(self) -> list[str]:
+    def also_known_as(self) -> list:
         """Other character personalities"""
         if self._also_known_as is None:
             self._get_data()
         return self._also_known_as
 
     @property
-    def series(self) -> list[Series]:
+    def series(self) -> list:
         """Series in which the character appears"""
         if self._series is None:
             self._get_data()
