@@ -648,7 +648,6 @@ class Issue:
     @property
     def details(self) -> dict:
         """Issue details
-        TODO
 
         Parameters:
             format (str) : Issue format,
@@ -1175,9 +1174,14 @@ class Creator:
 
     def _get_data(self):
         url = f"https://leagueofcomicgeeks.com/people/{self.creator_id}/foo"
-        r = requests.get(url, headers=_headers)
+        s = requests.Session()
+        s.cookies.update({"ci_session": self._ci_session})
+        r = s.get(url, headers=_headers)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
+        comics_r = s.get(comics_url, headers=_headers)
+        comics_r.raise_for_status()
+        comics_soup = BeautifulSoup(comics_r.content, features="lxml")
         soup = BeautifulSoup(r.content, features="lxml")
 
         self._name = soup.find(class_="page-details").find("h1").text.strip()
@@ -1193,24 +1197,17 @@ class Creator:
 
         characters = soup.find(id="characters")
         self._characters = get_characters(characters, Character, self._ci_session)
-
+        comics = comics_soup.find(id="comic-list-block").find_all("li")
+        self._series = get_series(comics, Series, self._ci_session)
+        stats = comics_soup.findAll(class_="comic-score")
+        if stats:
+            self._issue_count = int(
+                stats[0].find(class_="text").text.strip().split("\n")[0].split(" ")[2]
+            )
+        else:
+            self._issue_count = "Unknown"
         if self._ci_session:
-            s = requests.Session()
-            s.cookies.update({"ci_session": self._ci_session})
-            r = s.get(comics_url, headers=_headers)
-            r.raise_for_status()
-            soup = BeautifulSoup(r.content, features="lxml")
-            comics = soup.find(id="comic-list-block").find_all("li")
-            self._series = get_series(comics, Series, self._ci_session)
-            stats = soup.findAll(class_="comic-score")
             if stats:
-                self._issue_count = int(
-                    stats[0]
-                    .find(class_="text")
-                    .text.strip()
-                    .split("\n")[0]
-                    .split(" ")[2]
-                )
                 self._owned = int(
                     stats[0]
                     .find(class_="text")
@@ -1226,7 +1223,6 @@ class Creator:
                     .split(" ")[0]
                 )
             else:
-                self._issue_count = "Unknown"
                 self._owned = 0
                 self._read = 0
 
@@ -1295,6 +1291,10 @@ class Character:
             self._get_data()
         return self._image
 
+    @image.setter
+    def image(self, value):
+        self._image = value
+
     @property
     def creators(self) -> list:
         """Character creators"""
@@ -1339,7 +1339,7 @@ class Character:
 
     @universe.setter
     def universe(self, value):
-        self._universe = value
+        self._universe = value.strip()
 
     @property
     def publisher(self) -> str:
@@ -1347,6 +1347,10 @@ class Character:
         if self._publisher is None:
             self._get_data()
         return self._publisher
+
+    @publisher.setter
+    def publisher(self, value):
+        self._publisher = value.strip()
 
     @property
     def name(self) -> str:
@@ -1390,9 +1394,14 @@ class Character:
 
     def _get_data(self):
         url = f"https://leagueofcomicgeeks.com/character/{self.character_id}/foo"
-        r = requests.get(url, headers=_headers)
+        s = requests.Session()
+        s.cookies.update({"ci_session": self._ci_session})
+        r = s.get(url, headers=_headers)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
+        comics_r = s.get(comics_url, headers=_headers)
+        comics_r.raise_for_status()
+        comics_soup = BeautifulSoup(comics_r.content, features="lxml")
         soup = BeautifulSoup(r.content, features="lxml")
 
         name = soup.find("h1").text.strip()
@@ -1414,13 +1423,15 @@ class Character:
 
         lists = soup.find(class_="content-sidebar-wrapper").findAll("ul")
         creators = []
-        for creator in lists[0].findAll("li"):
-            a = creator.find("a")
-            creator_id = a["href"].split("/")[2]
-            c = Creator(creator_id, self._ci_session)
-            c.name = creator.find(class_="title").text.strip()
-            c.url = a["href"]
-            creators.append(c)
+        if lists:
+            for creator in lists[0].findAll("li"):
+                a = creator.find("a")
+                if "people" in a["href"]:
+                    creator_id = a["href"].split("/")[2]
+                    c = Creator(creator_id, self._ci_session)
+                    c.name = creator.find(class_="title").text.strip()
+                    c.url = a["href"]
+                    creators.append(c)
         self._creators = creators
 
         info = []
@@ -1434,34 +1445,29 @@ class Character:
                 )
         self._information = info
 
-        self._image = soup.find(class_="content-sidebar-wrapper").find("img")["src"]
+        self._image = (
+            soup.find(class_="content-sidebar-wrapper").find("img")["src"]
+            if soup.find(class_="content-sidebar-wrapper").find("img")
+            else "#"
+        )
         self._url = soup.find(class_="content-sidebar-wrapper").find("a")["href"]
 
         aka = []
         if soup.find(id="personas"):
             for persona in soup.find(id="personas").findAll(class_="name"):
-                aka.append(
-                    {"name": persona.text.strip(), "url": persona.find("a")["href"]}
-                )
+                href = persona.find("a")["href"]
+                if "character" in href:
+                    aka.append({"name": persona.text.strip(), "url": href})
         self._also_known_as = aka
-
+        comics = comics_soup.find(id="comic-list-block").find_all("li")
+        self._series = get_series(comics, Series, self._ci_session)
+        stats = comics_soup.findAll(class_="comic-score")
+        if stats:
+            self._issue_count = int(
+                stats[0].find(class_="text").text.strip().split("\n")[0].split(" ")[2]
+            )
         if self._ci_session:
-            s = requests.Session()
-            s.cookies.update({"ci_session": self._ci_session})
-            r = s.get(comics_url, headers=_headers)
-            r.raise_for_status()
-            soup = BeautifulSoup(r.content, features="lxml")
-            comics = soup.find(id="comic-list-block").find_all("li")
-            self._series = get_series(comics, Series, self._ci_session)
-            stats = soup.findAll(class_="comic-score")
             if stats:
-                self._issue_count = self._owned = int(
-                    stats[0]
-                    .find(class_="text")
-                    .text.strip()
-                    .split("\n")[0]
-                    .split(" ")[2]
-                )
                 self._owned = int(
                     stats[0]
                     .find(class_="text")

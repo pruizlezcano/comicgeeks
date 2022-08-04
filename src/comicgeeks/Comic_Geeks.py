@@ -32,7 +32,7 @@ class Comic_Geeks:
             return ci_session
         return ""
 
-    def search_series(self, query: str) -> list:
+    def search_series(self, query: str) -> list[Series]:
         """Search series by name
 
         Args:
@@ -55,7 +55,7 @@ class Comic_Geeks:
         data = get_series(comics, Series, self._ci_session)
         return data
 
-    def search_creator(self, query: str) -> list:
+    def search_creator(self, query: str) -> list[Creator]:
         """Search series by name
 
         Args:
@@ -70,9 +70,11 @@ class Comic_Geeks:
         r.raise_for_status()
         soup = BeautifulSoup(r.content, features="lxml")
         content = soup.find(class_="comic-series-thumb-list")
+        if content is None:
+            return []
         data = []
         for item in content.findAll("li"):
-            creator_id = item.find("a")["href"].split("/")[2]
+            creator_id = int(item.find("a")["href"].split("/")[2])
             creator = Creator(creator_id, self._ci_session)
             creator.name = item.find(class_="title").text.strip()
             creator.url = item.find("a")["href"]
@@ -81,7 +83,36 @@ class Comic_Geeks:
             data.append(creator)
         return data
 
-    def new_releases(self) -> list:
+    def search_character(self, query: str) -> list[Character]:
+        query = query.strip().lower().replace(" ", "+")
+        url = f"https://leagueofcomicgeeks.com/search/characters?keyword={query}"
+        r = requests.get(url, headers=_headers)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.content, features="lxml")
+        content = soup.find(class_="character-thumb-list")
+        if content is None:
+            return []
+        data = []
+        for item in content.findAll("li"):
+            character_id = int(item.find("a")["href"].split("/")[2])
+            character = Character(character_id, self._ci_session)
+            character.name = item.find(class_="title").text.strip()
+            character.url = item.find("a")["href"]
+            character.real_name = (
+                item.find(class_="publisher").text.strip()
+                if item.find(class_="publisher")
+                else ""
+            )
+            if item.find(class_="series"):
+                character.publisher, character.universe = item.find(
+                    class_="series"
+                ).text.split("·")
+            if item.find("img"):
+                character.image = item.find("img")["data-src"]
+            data.append(character)
+        return data
+
+    def new_releases(self) -> list[Issue]:
         """Get this week new releases
 
         Returns:
