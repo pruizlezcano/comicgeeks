@@ -43,7 +43,9 @@ class Comic_Geeks:
         """
         query = query.strip().lower().replace(" ", "+")
         url = f"https://leagueofcomicgeeks.com/comic/get_comics?&list=search&list_option=series&view=thumbs&title={query}&order=alpha-asc&format[]=1&format[]=6"
-        r = requests.get(url, headers=_headers).json()
+        r = requests.get(url, headers=_headers)
+        r.raise_for_status()
+        r = r.json()
         if r["count"] == 0:
             return []
 
@@ -51,6 +53,32 @@ class Comic_Geeks:
         content = soup.find(id="comic-list-block")
         comics = content.find_all("li")
         data = get_series(comics, Series, self._ci_session)
+        return data
+
+    def search_creator(self, query: str) -> list:
+        """Search series by name
+
+        Args:
+            query (str): Series name
+
+        Returns:
+            list (Series): List of series
+        """
+        query = query.strip().lower().replace(" ", "+")
+        url = f"https://leagueofcomicgeeks.com/search/creators?keyword={query}"
+        r = requests.get(url, headers=_headers)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.content, features="lxml")
+        content = soup.find(class_="comic-series-thumb-list")
+        data = []
+        for item in content.findAll("li"):
+            creator_id = item.find("a")["href"].split("/")[2]
+            creator = Creator(creator_id, self._ci_session)
+            creator.name = item.find(class_="title").text.strip()
+            creator.url = item.find("a")["href"]
+            if item.find("img"):
+                creator.image = item.find("img")["src"]
+            data.append(creator)
         return data
 
     def new_releases(self) -> list:

@@ -1147,6 +1147,10 @@ class Creator:
             self._get_data()
         return self._image
 
+    @image.setter
+    def image(self, value):
+        self._image = value
+
     @property
     def name(self) -> list:
         """Creator name"""
@@ -1177,11 +1181,15 @@ class Creator:
         soup = BeautifulSoup(r.content, features="lxml")
 
         self._name = soup.find(class_="page-details").find("h1").text.strip()
-        self._description = soup.find("p").text
+        self._description = (
+            soup.find(class_="series-summary").find("p").text
+            if soup.find(class_="series-summary")
+            else ""
+        )
 
         avatar = soup.find(class_="avatar")
-        self._image = avatar.find("img")["src"]
-        self._url = avatar.find("a")["href"]
+        self._image = avatar.find("img")["src"] if avatar is not None else "#"
+        self._url = r.url.split(".com")[1]
 
         characters = soup.find(id="characters")
         self._characters = get_characters(characters, Character, self._ci_session)
