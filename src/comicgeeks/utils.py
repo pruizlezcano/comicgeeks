@@ -1,6 +1,6 @@
 def get_characters(content, Character, ci_session):
     characters_credits = []
-    if content:
+    if content is not None:
         characters = content.find_all(class_="row")[1].find_all(class_="row")
         for character in characters:
             url = character.find("a")["href"]

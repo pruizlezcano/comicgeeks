@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -19,7 +21,7 @@ class Comic_Geeks:
     def __init__(self, ci_session: str = None) -> None:
         self._ci_session: str = self._check_session(ci_session)
 
-    def _check_session(self, ci_session: str) -> bool:
+    def _check_session(self, ci_session: str = None) -> bool:
         """Check if session is valid.
         Make a request to the main page and if is redirected to the dashboard, the session is valid.
         """
@@ -112,13 +114,20 @@ class Comic_Geeks:
             data.append(character)
         return data
 
-    def new_releases(self) -> list[Issue]:
+    def new_releases(self, date: datetime = "now") -> list[Issue]:
         """Get this week new releases
+
+        Args:
+            date (datetime): Date to get new releases
 
         Returns:
             list (Issue): List of issues
         """
-        url = "https://leagueofcomicgeeks.com/comic/get_comics?list=releases&view=thumbs&format[]=1%2C6&date_type=week&date=now&order=pulls"
+        if date == "now":
+            date = datetime.now()
+        date = f"{date.month}/{date.day}/{date.year}"
+
+        url = f"https://leagueofcomicgeeks.com/comic/get_comics?list=releases&view=thumbs&format[]=1%2C6&date_type=week&date={date}&order=pulls"
         r = requests.get(url, headers=_headers).json()
         if r["count"] == 0:
             return []
@@ -129,20 +138,17 @@ class Comic_Geeks:
         data = []
         for comic in comics:
             a = comic.find("a")
-            price = comic.find(class_="price")
-            if price is not None:
-                price = price.text.split("·")[1].strip()[1::]
-                if "£" in price:
-                    price = price[1::]
-            else:
-                price = 0
+            price = (
+                float(comic.find(class_="price").text.split("·")[1].strip()[1::])
+                if comic.find(class_="price")
+                else "Unknown"
+            )
             pulls = comic["data-pulls"]
             rating = comic["data-community"]
             name = comic.find(class_="title").text.strip()
             issue_id = int(a["href"].split("/")[2])
             url = a["href"]
             store_date = comic.find(class_="date")["data-date"]
-            price = float(price)
             publisher = comic.find(class_="publisher").text.strip()
             cover = comic.find("img")["data-src"]
             community = {"rating": rating, "pulls": pulls}
