@@ -25,19 +25,19 @@ pip install comicgeeks
 ```python
 from comicgeeks import Comic_Geeks
 
-scraper = Comic_Geeks("my_ci_session")
+client = Comic_Geeks("my_ci_session")
 
 # search series
-scraper.search_series("daredevil")
+client.search_series("daredevil")
 
 # get new releases
-scraper.new_releases()
+client.new_releases()
 
 # get info about an issue
-scraper.issue_info(3616996)
+client.issue_info(3616996)
 ```
 
-For more info check the documentation in [http...](http...)
+For more info check the documentation in [https://comicgeeks.readthedocs.io](https://comicgeeks.readthedocs.io)
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

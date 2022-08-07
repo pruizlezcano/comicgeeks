@@ -150,10 +150,25 @@ conda activate comicgeeks
    This should automatically use [flake8]/[black] to check/fix the code style in a way that is compatible with the project.
 
 
-   > Don't forget to add documentation in case your
-   contribution adds an additional feature and is not just a bugfix.
+   > Don't forget to add unit tests and documentation in case your contribution adds an additional feature and is not just a bugfix.
 
    To commit your changes, please use the [conventional commits] specification.
+
+4. Please check that your changes don't break any unit tests with:
+
+   ```
+   tox
+   ```
+
+   (after having installed [tox] with `pip install tox` or `pipx`).
+
+   To run all the tests, create a file in the root directory of the project with the name `.devdata.env` and add your [leagueofcomicgeeks.com] ci_session to it:
+   ```
+   CI_SESSION="mycisession"
+   ```
+
+   You can also use [tox] to run several other pre-configured tasks in the
+   repository. Try `tox -av` to see a list of the available checks.
 
 ### Submit your contribution
 

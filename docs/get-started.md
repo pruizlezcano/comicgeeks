@@ -22,7 +22,7 @@ To do that, follow this steps:
 ```python
 from comicgeeks import Comic_Geeks
 
-scraper = Comic_Geeks("my_ci_session")
+scraper = Comic_Geeks("mycisession")
 
 # search series
 scraper.search_series("daredevil")
@@ -33,3 +33,5 @@ scraper.new_releases()
 # get info about an issue
 scraper.issue_info(3616996)
 ```
+
+Check the [examples](/examples) tab for more use cases.

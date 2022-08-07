@@ -16,7 +16,7 @@ comicgeeks
 
 .. toctree::
    :caption: comicgeeks
-   :maxdepth: 2
+   :maxdepth: 3
    :hidden:
 
    get-started
