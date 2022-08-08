@@ -151,7 +151,7 @@ class Comic_Geeks:
             store_date = comic.find(class_="date")["data-date"]
             publisher = comic.find(class_="publisher").text.strip()
             cover = comic.find("img")["data-src"]
-            community = {"rating": rating, "pulls": pulls}
+            community = {"rating": rating, "pull": pulls}
 
             issue = Issue(
                 issue_id=issue_id,

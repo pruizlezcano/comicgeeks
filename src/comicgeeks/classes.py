@@ -30,6 +30,8 @@ class Series:
         self._url = None
         self._cover = None
         self._user = {"pull": None, "owned": None, "read": None}
+        self._session = requests.Session()
+        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def user(self) -> dict:
@@ -149,13 +151,11 @@ class Series:
     def _get_data(self):
         """Get series info"""
         url = f"https://leagueofcomicgeeks.com/comic/get_comics?&list=search&view=thumbs&format[]=1&series_id={self._series_id}&character=0&order=date-desc"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
-        r = s.get(url, headers=_headers)
+        r = self._session.get(url, headers=_headers)
         r.raise_for_status()
         r = r.json()
         if r["count"] == 0:
-            raise Exception("Series is empty")
+            raise Exception("No series found")
         soup = BeautifulSoup(r["list"], features="lxml")
         header = BeautifulSoup(r["header"], features="lxml")
         statbar = BeautifulSoup(r["statbar"], features="lxml")
@@ -208,7 +208,9 @@ class Series:
 
         self._name = r["series"]["title"]
         self._publisher = r["series"]["publisher_name"]
-        self._description = r["series"]["description"]
+        self._description = BeautifulSoup(
+            r["series"]["description"], features="lxml"
+        ).text
         self._start_year = int(begin.strip()) if begin else 0
         self._end_year = int(end.strip()) if end and end.strip() != "Present" else 0
         self._issues = sorted(issues, key=lambda x: int(x.number))
@@ -216,7 +218,11 @@ class Series:
         self._url = header.find(class_="dropdown-item")["href"].split(
             "/submit-new-issue"
         )[0]
-        self._cover = header.find(class_="cover")["style"].split("'")[1]
+        self._cover = (
+            header.find(class_="cover")["style"].split("'")[1]
+            if header.find(class_="cover")
+            else "#"
+        )
         if self._ci_session:
             self._user["pull"] = True if statbar.find(class_="btn-remove") else False
             stats = statbar.findAll(class_="comic-score")
@@ -252,8 +258,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 1,
@@ -261,7 +265,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def unsubscribe(self) -> dict:
@@ -273,8 +277,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 1,
@@ -282,7 +284,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def pull_tp(self) -> dict:
@@ -294,8 +296,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 1,
@@ -303,7 +303,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def pull_hc(self) -> dict:
@@ -315,8 +315,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 1,
@@ -324,7 +322,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_collection(self) -> dict:
@@ -336,8 +334,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 2,
@@ -345,7 +341,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_wishlist(self) -> dict:
@@ -357,8 +353,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 3,
@@ -366,7 +360,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_missing_to_wishlist(self) -> dict:
@@ -379,8 +373,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 3,
@@ -388,7 +380,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def mark_read(self) -> dict:
@@ -400,8 +392,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 5,
@@ -409,7 +399,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def mark_owned_read(self) -> dict:
@@ -421,8 +411,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 5,
@@ -430,7 +418,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_collection(self) -> dict:
@@ -442,8 +430,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 2,
@@ -451,7 +437,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_wishlist(self) -> dict:
@@ -463,8 +449,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 3,
@@ -472,7 +456,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_readlist(self) -> dict:
@@ -484,8 +468,6 @@ class Series:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {
             "series_id": self._series_id,
             "list_id": 5,
@@ -493,7 +475,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def json(self) -> dict:
@@ -551,6 +533,8 @@ class Issue:
         self._store_date = None
         self._url = None
         self._variant_covers = None
+        self._session = requests.Session()
+        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def characters(self) -> list:
@@ -601,7 +585,7 @@ class Issue:
         """Dictionary with community data
 
         Parameters:
-            pull (int) : Number of pulls,
+            pull (int|str) : Number of pulls or "Unknown" if the issue was already released,
             collect (int) : Number of users who have it,
             readlist (int) : Number of user who read it,
             wishlist (int) : Number of user who have it in their wishlist,
@@ -652,7 +636,6 @@ class Issue:
         Parameters:
             format (str) : Issue format,
             page_count (str) : Number of pages,
-            cover_price (str?) : Issue price,
             upc (str?) : UPC code,
             distributor_sku (str?) : SKU code,
         """
@@ -716,9 +699,9 @@ class Issue:
         """Issue pagination
 
         Parameters:
-            prev (str) : url to previous issue
-            series (str): url to series
-            next (str): url to next issue
+            prev (Issue) : previous issue
+            series (Series): series
+            next (Issue): next issue
         """
         if self._series_pagination is None:
             self._get_data()
@@ -757,9 +740,7 @@ class Issue:
         """Get series info"""
 
         url = f"https://leagueofcomicgeeks.com/comic/{self.issue_id}/foo"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
-        r = s.get(url, headers=_headers)
+        r = self._session.get(url, headers=_headers)
         r.raise_for_status()
         soup = BeautifulSoup(r.content, features="lxml")
         year, month, day = list(
@@ -778,6 +759,7 @@ class Issue:
                 detail.find(class_="value").text.strip().lower()
             )
         price = d.pop("cover_price") if "cover_price" in d else "Unknown"
+        price = float(price[1::]) if price != "Unknown" else price
 
         creators = comic.find(id="creators")
         person_credits = []
@@ -815,7 +797,7 @@ class Issue:
                     {
                         "name": img["alt"],
                         "url": variant.find("a")["href"],
-                        "image": img["data-src"] if "data-src" in img else "#",
+                        "image": img["data-src"],
                     }
                 )
         pagination = comic.find(class_="series-pagination")
@@ -870,19 +852,29 @@ class Issue:
         self._variant_covers = covers[1:]
         self._series_pagination = series_pagination
         self._community["pull"] = (
-            counters_data["pull"] if "pull" in counters_data else "Unknown"
+            int(counters_data["pull"].replace(",", ""))
+            if "pull" in counters_data
+            else "Unknown"
         )
         self._community["collect"] = (
-            counters_data["collect"] if "collect" in counters_data else "Unknown"
+            int(counters_data["collect"].replace(",", ""))
+            if "collect" in counters_data
+            else "Unknown"
         )
         self._community["readlist"] = (
-            counters_data["readlist"] if "readlist" in counters_data else "Unknown"
+            int(counters_data["readlist"].replace(",", ""))
+            if "readlist" in counters_data
+            else "Unknown"
         )
         self._community["wishlist"] = (
-            counters_data["wishlist"] if "wishlist" in counters_data else "Unknown"
+            int(counters_data["wishlist"].replace(",", ""))
+            if "wishlist" in counters_data
+            else "Unknown"
         )
         self._community["rating"] = (
-            counters_data["rating"] if "rating" in counters_data else "Unknown"
+            int(counters_data["rating"].replace(",", ""))
+            if "rating" in counters_data
+            else "Unknown"
         )
         self._price = price
         self._url = "/" + "/".join(r.url.split("/")[3:])
@@ -921,10 +913,8 @@ class Issue:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "list_id": 1, "action_id": 1}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def unsubscribe(self) -> dict:
@@ -936,10 +926,8 @@ class Issue:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "list_id": 1, "action_id": 0}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_collection(self) -> dict:
@@ -951,10 +939,8 @@ class Issue:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "list_id": 2, "action_id": 1}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_collection(self) -> dict:
@@ -966,10 +952,8 @@ class Issue:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "list_id": 2, "action_id": 0}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def mark_read(self) -> dict:
@@ -981,10 +965,8 @@ class Issue:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "list_id": 5, "action_id": 1}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_readlist(self) -> dict:
@@ -995,11 +977,9 @@ class Issue:
         """
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
-        url = "https://leagueofcomicgeeks.com/comic/my_list_movessss"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
+        url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 5, "action_id": 0}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_wishlist(self) -> dict:
@@ -1011,10 +991,8 @@ class Issue:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "list_id": 3, "action_id": 1}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_wishlist(self) -> dict:
@@ -1026,10 +1004,8 @@ class Issue:
         if not self._ci_session:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "list_id": 3, "action_id": 0}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def rate(self, score: int) -> dict:
@@ -1046,17 +1022,15 @@ class Issue:
         if score < 0 or score > 5:
             return {"text": "Score must be between 1 and 5", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/post_rating"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
         data = {"comic_id": self.issue_id, "score": score}
-        r = s.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, headers=_headers, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def json(self) -> dict:
         """Return data in json format"""
         return {
             "issue_id": self.issue_id,
-            "character_credits": self.characters,
+            "characters": self.characters,
             "cover": self.cover,
             "community": self.community,
             "description": self.description,
@@ -1066,7 +1040,7 @@ class Issue:
             "person_credits": self.person_credits,
             "price": self.price,
             "publisher": self.publisher,
-            "pagination": self.series_pagination,
+            "series_pagination": self.series_pagination,
             "store_date": self.store_date,
             "url": self.url,
             "variant_covers": self.variant_covers,
@@ -1089,6 +1063,8 @@ class Creator:
         self._read = None
         self._owned = None
         self._issue_count = None
+        self._session = requests.Session()
+        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def issue_count(self) -> int:
@@ -1174,12 +1150,10 @@ class Creator:
 
     def _get_data(self):
         url = f"https://leagueofcomicgeeks.com/people/{self.creator_id}/foo"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
-        r = s.get(url, headers=_headers)
+        r = self._session.get(url, headers=_headers)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
-        comics_r = s.get(comics_url, headers=_headers)
+        comics_r = self._session.get(comics_url, headers=_headers)
         comics_r.raise_for_status()
         comics_soup = BeautifulSoup(comics_r.content, features="lxml")
         soup = BeautifulSoup(r.content, features="lxml")
@@ -1262,6 +1236,8 @@ class Character:
         self._read = None
         self._owned = None
         self._issue_count = None
+        self._session = requests.Session()
+        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def read(self) -> int:
@@ -1394,12 +1370,10 @@ class Character:
 
     def _get_data(self):
         url = f"https://leagueofcomicgeeks.com/character/{self.character_id}/foo"
-        s = requests.Session()
-        s.cookies.update({"ci_session": self._ci_session})
-        r = s.get(url, headers=_headers)
+        r = self._session.get(url, headers=_headers)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
-        comics_r = s.get(comics_url, headers=_headers)
+        comics_r = self._session.get(comics_url, headers=_headers)
         comics_r.raise_for_status()
         comics_soup = BeautifulSoup(comics_r.content, features="lxml")
         soup = BeautifulSoup(r.content, features="lxml")
