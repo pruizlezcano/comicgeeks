@@ -1,10 +1,11 @@
-![PyPI](https://img.shields.io/pypi/v/comicgeeks?color=5593c8&logoColor=a7bfc1&style=for-the-badge)
+[![PyPI](https://img.shields.io/pypi/v/comicgeeks?color=5593c8&logoColor=a7bfc1&style=for-the-badge)](https://pypi.org/project/comicgeeks/)
+[![Coveralls](https://img.shields.io/coveralls/github/pruizlezcano/comicgeeks?style=for-the-badge)](https://coveralls.io/github/pruizlezcano/comicgeeks?branch=main)
 [![forthebadge](https://forthebadge.com/images/badges/contains-tasty-spaghetti-code.svg)](https://forthebadge.com)
 # comicgeeks
 
 > A python client for League of Comics Geeks.
 
-* Search series by name
+* Search series, creators and characters by name
 * Get series, issues, creators and characters information
 * Manage your comic collection
   * Subscribe to series

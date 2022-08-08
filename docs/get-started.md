@@ -22,16 +22,16 @@ To do that, follow this steps:
 ```python
 from comicgeeks import Comic_Geeks
 
-scraper = Comic_Geeks("mycisession")
+client = Comic_Geeks("mycisession")
 
 # search series
-scraper.search_series("daredevil")
+client.search_series("daredevil")
 
 # get new releases
-scraper.new_releases()
+client.new_releases()
 
 # get info about an issue
-scraper.issue_info(3616996)
+client.issue_info(3616996)
 ```
 
 Check the [examples](/examples) tab for more use cases.
