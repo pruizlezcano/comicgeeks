@@ -797,7 +797,7 @@ class Issue:
                     {
                         "name": img["alt"],
                         "url": variant.find("a")["href"],
-                        "image": img["data-src"],
+                        "image": img["data-src"] if "data-src" in img else "#",
                     }
                 )
         pagination = comic.find(class_="series-pagination")
@@ -873,7 +873,7 @@ class Issue:
         )
         self._community["rating"] = (
             int(counters_data["rating"].replace(",", ""))
-            if "rating" in counters_data
+            if "rating" in counters_data and counters_data["rating"] is not None
             else "Unknown"
         )
         self._price = price
