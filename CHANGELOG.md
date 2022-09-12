@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2022-09-12)
+### Fixes
+* **issue:** error when some data is not available ([122df9b](https://github.com/pruizlezcano/comicgeeks/commit/122df9b23b5b8e34243dc20ed106b39c08d618f7))
+
 ## 0.2.0 (2022-08-08)
 ### Features
 
