@@ -107,8 +107,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "comicgeeks"
-version = "0.1.0"
-release = "0.1.0"
+version = "0.2.2"
+release = "0.2.2"
 author = "Pablo Ruiz"
 copyright = '2022 <a href="https://github.com/pruizlezcano">Pablo Ruiz</a>'
 language = "en"
