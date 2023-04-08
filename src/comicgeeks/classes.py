@@ -873,7 +873,9 @@ class Issue:
         )
         self._community["rating"] = (
             int(counters_data["rating"].replace(",", ""))
-            if "rating" in counters_data and counters_data["rating"] is not None
+            if "rating" in counters_data
+            and counters_data["rating"] is not None
+            and counters_data["rating"] != "TBD"
             else "Unknown"
         )
         self._price = price
