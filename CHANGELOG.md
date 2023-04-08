@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3 (2023-04-08)
+
+### Fixes
+
+- **issue:** error getting rating of new issues that haven't had any ratings [#2](https://github.com/pruizlezcano/comicgeeks/issues/2) ([b402714](https://github.com/pruizlezcano/comicgeeks/commit/b40271400e877e792b1be9a2a458e6f5a9eb2eba))
+
 ## 0.2.2 (2023-01-16)
 
 ### Fixes
