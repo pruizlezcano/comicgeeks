@@ -6,19 +6,15 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 
-from .extract import extract
-from .utils import get_characters, get_series
-
-_headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:20.0) Gecko/20100101 Firefox/20.0"
-}
+from comicgeeks.extract import extract
+from comicgeeks.utils import get_characters, get_series
 
 
 class Series:
     """ComicGeeks Series class"""
 
-    def __init__(self, series_id: int, ci_session: str = None):
-        self._ci_session = ci_session
+    def __init__(self, series_id: int, session: requests.Session):
+        self._session = session
         self._series_id = series_id
         self._name = None
         self._publisher = None
@@ -30,8 +26,6 @@ class Series:
         self._url = None
         self._cover = None
         self._user = {"pull": None, "owned": None, "read": None}
-        self._session = requests.Session()
-        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def user(self) -> dict:
@@ -46,7 +40,7 @@ class Series:
             self._user["pull"] is None
             or self._user["owned"] is None
             or self._user["read"] is None
-        ) and self._ci_session:
+        ) and self._session.authenticated:
             self._get_data()
         return self._user
 
@@ -151,7 +145,7 @@ class Series:
     def _get_data(self):
         """Get series info"""
         url = f"https://leagueofcomicgeeks.com/comic/get_comics?&list=search&view=thumbs&format[]=1&series_id={self._series_id}&character=0&order=date-desc"
-        r = self._session.get(url, headers=_headers)
+        r = self._session.get(url)
         r.raise_for_status()
         r = r.json()
         if r["count"] == 0:
@@ -171,7 +165,7 @@ class Series:
             issue_id = int(issue.find("a")["href"].split("/")[2])
             i = Issue(
                 issue_id=issue_id,
-                ci_session=self._ci_session,
+                session=self._session,
             )
 
             i.name = title
@@ -223,7 +217,7 @@ class Series:
             if header.find(class_="cover")
             else "#"
         )
-        if self._ci_session:
+        if self._session.authenticated:
             self._user["pull"] = True if statbar.find(class_="btn-remove") else False
             stats = statbar.findAll(class_="comic-score")
             if stats:
@@ -255,7 +249,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -265,7 +259,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def unsubscribe(self) -> dict:
@@ -274,7 +268,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -284,7 +278,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def pull_tp(self) -> dict:
@@ -293,7 +287,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -303,7 +297,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def pull_hc(self) -> dict:
@@ -312,7 +306,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -322,7 +316,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_collection(self) -> dict:
@@ -331,7 +325,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -341,7 +335,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_wishlist(self) -> dict:
@@ -350,7 +344,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -360,7 +354,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_missing_to_wishlist(self) -> dict:
@@ -370,7 +364,7 @@ class Series:
             dict: {"text": "", "type": "error|success"}
         """
 
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -380,7 +374,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def mark_read(self) -> dict:
@@ -389,7 +383,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -399,7 +393,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def mark_owned_read(self) -> dict:
@@ -408,7 +402,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -418,7 +412,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_collection(self) -> dict:
@@ -427,7 +421,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -437,7 +431,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_wishlist(self) -> dict:
@@ -446,7 +440,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -456,7 +450,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_readlist(self) -> dict:
@@ -465,7 +459,7 @@ class Series:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_bulk"
         data = {
@@ -475,7 +469,7 @@ class Series:
             "date": "",
             "date_type": "",
         }
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def json(self) -> dict:
@@ -498,14 +492,9 @@ class Series:
 class Issue:
     """ComicGeeks Issue class"""
 
-    def __init__(
-        self,
-        issue_id: int,
-        ci_session: str = None,
-    ):
-        self._ci_session = ci_session
+    def __init__(self, issue_id: int, session: requests.Session):
         self._issue_id = issue_id
-
+        self._session = session
         self._characters = None
         self._cover = None
         self._community = {
@@ -533,8 +522,6 @@ class Issue:
         self._store_date = None
         self._url = None
         self._variant_covers = None
-        self._session = requests.Session()
-        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def characters(self) -> list:
@@ -572,7 +559,7 @@ class Issue:
             or self._user["readlist"] is None
             or self._user["wishlist"] is None
             or self._user["rating"] is None
-        ) and self._ci_session:
+        ) and self._session.authenticated:
             self._get_data()
         return self._user
 
@@ -740,7 +727,7 @@ class Issue:
         """Get series info"""
 
         url = f"https://leagueofcomicgeeks.com/comic/{self.issue_id}/foo"
-        r = self._session.get(url, headers=_headers)
+        r = self._session.get(url)
         r.raise_for_status()
         soup = BeautifulSoup(r.content, features="lxml")
         year, month, day = list(
@@ -768,7 +755,7 @@ class Issue:
             for creator in creators:
                 creator_url = creator.find("a")["href"]
                 creator_id = creator_url.split("/")[2]
-                c = Creator(creator_id, self._ci_session)
+                c = Creator(creator_id, self._session)
                 c.url = creator_url
                 c.name = creator.find(class_="name").text.strip()
                 person_credits.append(
@@ -779,7 +766,7 @@ class Issue:
                 )
 
         characters = comic.find(id="characters")
-        characters_credits = get_characters(characters, Character, self._ci_session)
+        characters_credits = get_characters(characters, Character, self._session)
 
         covers = []
         cover = comic.find(class_="cover-art")
@@ -803,17 +790,20 @@ class Issue:
         pagination = comic.find(class_="series-pagination")
         series_pagination = {
             "prev": Issue(
-                pagination.find(class_="prev")["href"].split("/")[2], self._ci_session
+                pagination.find(class_="prev")["href"].split("/")[2],
+                self._session,
             )
             if pagination.find(class_="prev")["href"] != "#"
             else None,
             "series": Series(
-                pagination.find(class_="series")["href"].split("/")[3], self._ci_session
+                pagination.find(class_="series")["href"].split("/")[3],
+                self._session,
             )
             if pagination.find(class_="series")["href"] != "#"
             else None,
             "next": Issue(
-                pagination.find(class_="next")["href"].split("/")[2], self._ci_session
+                pagination.find(class_="next")["href"].split("/")[2],
+                self._session,
             )
             if pagination.find(class_="next")["href"] != "#"
             else None,
@@ -881,7 +871,7 @@ class Issue:
         self._price = price
         self._url = "/" + "/".join(r.url.split("/")[3:])
 
-        if self._ci_session:
+        if self._session.authenticated:
             counters = soup.findAll(class_="comic-controller")[1:]
             self._user["pull"] = True if "active" in counters[0]["class"] else False
             self._user["collect"] = (
@@ -912,11 +902,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 1, "action_id": 1}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def unsubscribe(self) -> dict:
@@ -925,11 +915,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 1, "action_id": 0}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_collection(self) -> dict:
@@ -938,11 +928,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 2, "action_id": 1}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_collection(self) -> dict:
@@ -951,11 +941,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 2, "action_id": 0}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def mark_read(self) -> dict:
@@ -964,11 +954,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 5, "action_id": 1}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_readlist(self) -> dict:
@@ -977,11 +967,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 5, "action_id": 0}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def add_to_wishlist(self) -> dict:
@@ -990,11 +980,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 3, "action_id": 1}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def remove_from_wishlist(self) -> dict:
@@ -1003,11 +993,11 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/my_list_move"
         data = {"comic_id": self.issue_id, "list_id": 3, "action_id": 0}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def rate(self, score: int) -> dict:
@@ -1019,13 +1009,13 @@ class Issue:
         Returns:
             dict: {"text": "", "type": "error|success"}
         """
-        if not self._ci_session:
+        if not self._session.authenticated:
             return {"text": "No ci_session is given", "type": "error"}
         if score < 0 or score > 5:
             return {"text": "Score must be between 1 and 5", "type": "error"}
         url = "https://leagueofcomicgeeks.com/comic/post_rating"
         data = {"comic_id": self.issue_id, "score": score}
-        r = self._session.post(url, headers=_headers, data=data).json()
+        r = self._session.post(url, data=data).json()
         return {"text": r["text"], "type": r["type"]}
 
     def json(self) -> dict:
@@ -1053,9 +1043,9 @@ class Issue:
 class Creator:
     """Creator class"""
 
-    def __init__(self, creator_id: int, ci_session: str = None):
+    def __init__(self, creator_id: int, session: requests.Session):
         self._characters = None
-        self._ci_session = ci_session
+        self._session = session
         self._series = None
         self._creator_id = creator_id
         self._description = None
@@ -1065,27 +1055,25 @@ class Creator:
         self._read = None
         self._owned = None
         self._issue_count = None
-        self._session = requests.Session()
-        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def issue_count(self) -> int:
         """Number of issues made by this creator"""
-        if self._issue_count is None and self._ci_session:
+        if self._issue_count is None and self._session.authenticated:
             self._get_data()
         return self._issue_count
 
     @property
     def read(self) -> int:
         """Issues by this creator read"""
-        if self._read is None and self._ci_session:
+        if self._read is None and self._session.authenticated:
             self._get_data()
         return self._read
 
     @property
     def owned(self) -> int:
         """Issues by this creator owned"""
-        if self._owned is None and self._ci_session:
+        if self._owned is None and self._session.authenticated:
             self._get_data()
         return self._owned
 
@@ -1152,10 +1140,10 @@ class Creator:
 
     def _get_data(self):
         url = f"https://leagueofcomicgeeks.com/people/{self.creator_id}/foo"
-        r = self._session.get(url, headers=_headers)
+        r = self._session.get(url)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
-        comics_r = self._session.get(comics_url, headers=_headers)
+        comics_r = self._session.get(comics_url)
         comics_r.raise_for_status()
         comics_soup = BeautifulSoup(comics_r.content, features="lxml")
         soup = BeautifulSoup(r.content, features="lxml")
@@ -1172,9 +1160,9 @@ class Creator:
         self._url = r.url.split(".com")[1]
 
         characters = soup.find(id="characters")
-        self._characters = get_characters(characters, Character, self._ci_session)
+        self._characters = get_characters(characters, Character, self._session)
         comics = comics_soup.find(id="comic-list-block").find_all("li")
-        self._series = get_series(comics, Series, self._ci_session)
+        self._series = get_series(comics, Series, self._session)
         stats = comics_soup.findAll(class_="comic-score")
         if stats:
             self._issue_count = int(
@@ -1182,7 +1170,7 @@ class Creator:
             )
         else:
             self._issue_count = "Unknown"
-        if self._ci_session:
+        if self._session.authenticated:
             if stats:
                 self._owned = int(
                     stats[0]
@@ -1221,9 +1209,9 @@ class Creator:
 class Character:
     """Character class"""
 
-    def __init__(self, character_id: int, ci_session: str = None):
+    def __init__(self, character_id: int, session: requests.Session):
         self._character_id = character_id
-        self._ci_session = ci_session
+        self._session = session
         self._image = None
         self._creators = None
         self._description = None
@@ -1238,27 +1226,25 @@ class Character:
         self._read = None
         self._owned = None
         self._issue_count = None
-        self._session = requests.Session()
-        self._session.cookies.update({"ci_session": ci_session})
 
     @property
     def read(self) -> int:
         """Issues with this character read"""
-        if self._read is None and self._ci_session:
+        if self._read is None and self._session.authenticated:
             self._get_data()
         return self._read
 
     @property
     def issue_count(self) -> int:
         """Issues with this character"""
-        if self._issue_count is None and self._ci_session:
+        if self._issue_count is None and self._session.authenticated:
             self._get_data()
         return self._issue_count
 
     @property
     def owned(self) -> int:
         """Issues with this character owned"""
-        if self._owned is None and self._ci_session:
+        if self._owned is None and self._session.authenticated:
             self._get_data()
         return self._owned
 
@@ -1372,10 +1358,10 @@ class Character:
 
     def _get_data(self):
         url = f"https://leagueofcomicgeeks.com/character/{self.character_id}/foo"
-        r = self._session.get(url, headers=_headers)
+        r = self._session.get(url)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
-        comics_r = self._session.get(comics_url, headers=_headers)
+        comics_r = self._session.get(comics_url)
         comics_r.raise_for_status()
         comics_soup = BeautifulSoup(comics_r.content, features="lxml")
         soup = BeautifulSoup(r.content, features="lxml")
@@ -1404,7 +1390,7 @@ class Character:
                 a = creator.find("a")
                 if "people" in a["href"]:
                     creator_id = a["href"].split("/")[2]
-                    c = Creator(creator_id, self._ci_session)
+                    c = Creator(creator_id, self._session)
                     c.name = creator.find(class_="title").text.strip()
                     c.url = a["href"]
                     creators.append(c)
@@ -1436,13 +1422,13 @@ class Character:
                     aka.append({"name": persona.text.strip(), "url": href})
         self._also_known_as = aka
         comics = comics_soup.find(id="comic-list-block").find_all("li")
-        self._series = get_series(comics, Series, self._ci_session)
+        self._series = get_series(comics, Series, self._session)
         stats = comics_soup.findAll(class_="comic-score")
         if stats:
             self._issue_count = int(
                 stats[0].find(class_="text").text.strip().split("\n")[0].split(" ")[2]
             )
-        if self._ci_session:
+        if self._session.authenticated:
             if stats:
                 self._owned = int(
                     stats[0]

@@ -1,11 +1,14 @@
-def get_characters(content, Character, ci_session):
+import requests
+
+
+def get_characters(content, Character, session: requests.Session):
     characters_credits = []
     if content is not None:
         characters = content.find_all(class_="row")[1].find_all(class_="row")
         for character in characters:
             url = character.find("a")["href"]
             character_id = int(url.split("/")[2])
-            c = Character(character_id, ci_session)
+            c = Character(character_id, session)
             c.name = character.find(class_="name").text.strip()
             c.url = url
             real_name = character.find(class_="real-name")
@@ -18,13 +21,13 @@ def get_characters(content, Character, ci_session):
     return characters_credits
 
 
-def get_series(content, Series, ci_session):
+def get_series(content, Series, session: requests.Session):
     data = []
     for comic in content:
         a = comic.find("a")
         series = comic.find(class_="series")
         series_id = int(a["data-id"])
-        s = Series(series_id, ci_session)
+        s = Series(series_id, session)
         s.name = comic.find(class_="title").text.strip()
         s.url = a["href"]
         s.start_year = series["data-begin"]
