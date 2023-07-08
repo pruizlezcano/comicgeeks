@@ -21,7 +21,25 @@ class Comic_Geeks:
     def __init__(self, ci_session: str = None) -> None:
         self._ci_session: str = self._check_session(ci_session)
 
-    def _check_session(self, ci_session: str = None) -> bool:
+    def login(self, username: str, password: str) -> bool:
+        """Login to League of Comic Geeks
+
+        Args:
+            username (str): Username
+            password (str): Password
+
+        Returns:
+            str: ci_session cookie
+        """
+        url = "https://leagueofcomicgeeks.com/login"
+        r = requests.post(
+            url, headers=_headers, data={"username": username, "password": password}
+        )
+        r.raise_for_status()
+        self._ci_session = self._check_session(r.cookies.get("ci_session"))
+        return True if self._ci_session else False
+
+    def _check_session(self, ci_session: str = None) -> str:
         """Check if session is valid.
         Make a request to the main page and if is redirected to the dashboard, the session is valid.
         """
@@ -30,6 +48,7 @@ class Comic_Geeks:
         s = requests.Session()
         s.cookies.update({"ci_session": ci_session})
         r = s.get("https://leagueofcomicgeeks.com/", headers=_headers)
+        r.raise_for_status()
         if "dashboard" in r.url:
             return ci_session
         return ""
