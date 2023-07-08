@@ -52,6 +52,7 @@ def test_get_issue_by_id():
     assert data["details"] == {
         "format": "comic",
         "page_count": "28 pages",
+        "cover_date": "sep 2019",
         "upc": "75960609142300811",
         "distributor_sku": "may190864",
     }
@@ -96,6 +97,7 @@ def test_get_issue_without_variant_covers():
 
 
 ## TODO: issue without creator credits
+
 
 def test_add_to_collection_error():
     client = Comic_Geeks()
