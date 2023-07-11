@@ -28,14 +28,14 @@ def test_invalid_session():
 def test_valid_session():
     """Valid session provided test"""
     client = Comic_Geeks()
-    data = client._validate_session(env["CI_SESSION"])
+    data = client._validate_session(env["LCG_CI_SESSION"])
     assert data == True
 
 
 def test_login():
     """Login test"""
     client = Comic_Geeks()
-    data = client.login(env["USERNAME"], env["PASSWORD"])
+    data = client.login(env["LCG_USERNAME"], env["LCG_PASSWORD"])
     assert data == True
 
 

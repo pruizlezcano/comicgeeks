@@ -49,90 +49,90 @@ def test_get_series_by_id():
 
 
 def test_get_series_by_id_session():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     data = client.series_info(150065)
     assert any(map(lambda x: data.user[x] is not None, data.user.keys()))
 
 
 def test_add_missing():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.add_missing_to_wishlist()
     assert data["type"] == "success"
 
 
 def test_add_collection():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.add_to_collection()
     assert data["type"] == "success"
 
 
 def test_add_wishlist():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.add_to_wishlist()
     assert data["type"] == "success"
 
 
 def test_mark_owned():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.mark_owned_read()
     assert data["type"] == "success"
 
 
 def test_mark_read():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.mark_read()
     assert data["type"] == "success"
 
 
 def test_pull():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.pull()
     assert data["type"] == "success"
 
 
 def test_pull_hc():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.pull_hc()
     assert data["type"] == "success"
 
 
 def test_pull_tp():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.pull_tp()
     assert data["type"] == "success"
 
 
 def test_remove_collection():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.remove_from_collection()
     assert data["type"] == "success"
 
 
 def test_remove_readlist():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.remove_from_readlist()
     assert data["type"] == "success"
 
 
 def test_remove_wishlist():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.remove_from_wishlist()
     assert data["type"] == "success"
 
 
 def test_unsubscribe():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     series = client.series_info(148315)
     data = series.unsubscribe()
     assert data["type"] == "success"

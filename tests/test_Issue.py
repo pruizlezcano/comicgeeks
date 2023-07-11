@@ -77,7 +77,7 @@ def test_get_issue_by_id():
 
 def test_get_issue_by_id_session():
     """Get issue by id test"""
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     data = client.issue_info(3616996)
     assert any(map(lambda x: data.user[x] is not None, data.user.keys()))
 
@@ -163,70 +163,70 @@ def test_unsubscribe_error():
 
 
 def test_add_to_collection():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.add_to_collection()
     assert data["type"] == "success"
 
 
 def test_add_to_wishlist():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.add_to_wishlist()
     assert data["type"] == "success"
 
 
 def test_mark_read():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.mark_read()
     assert data["type"] == "success"
 
 
 def test_pull():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.pull()
     assert data["type"] == "success"
 
 
 def test_rate():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.rate(0)
     assert data["type"] == "success"
 
 
 def test_rate_invalid_error():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.rate(20)
     assert data["type"] == "error"
 
 
 def test_remove_collection():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.remove_from_collection()
     assert data["type"] == "success"
 
 
 def test_remove_readlist():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.remove_from_readlist()
     assert data["type"] == "success"
 
 
 def test_remove_wishlist():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.remove_from_wishlist()
     assert data["type"] == "success"
 
 
 def test_unsubscribe():
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     issue = client.issue_info(7757146)
     data = issue.unsubscribe()
     assert data["type"] == "success"

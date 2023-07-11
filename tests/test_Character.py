@@ -50,7 +50,7 @@ def test_get_character_by_id():
 
 def test_get_character_by_id_session():
     """Get character by id test"""
-    client = Comic_Geeks(env["CI_SESSION"])
+    client = Comic_Geeks(env["LCG_CI_SESSION"])
     data = client.character_info(11699)
     assert data.owned is not None
     assert data.read is not None
