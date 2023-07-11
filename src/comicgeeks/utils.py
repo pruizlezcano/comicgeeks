@@ -37,3 +37,9 @@ def get_series(content, Series, session: requests.Session):
         s.issue_count = comic.find(class_="count-issues").text.strip()
         data.append(s)
     return data
+
+
+def is_trade_paperback(issue_id: int):
+    url = f"https://leagueofcomicgeeks.com/comic/{issue_id}/foo"
+    r = requests.get(url)
+    return r.url[-3:] == "-tp"

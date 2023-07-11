@@ -2,12 +2,20 @@
 # Please, make a pull request if you know how to fix it
 
 import datetime
-
+import re
 import requests
 from bs4 import BeautifulSoup
 
 from comicgeeks.extract import extract
 from comicgeeks.utils import get_characters, get_series
+
+
+class Issue:
+    None
+
+
+class Trade_Paperback:
+    None
 
 
 class Series:
@@ -23,6 +31,8 @@ class Series:
         self._end_year = None
         self._issues = None
         self._issue_count = None
+        self._trade_paperbacks = None
+        self._trade_paperback_count = None
         self._url = None
         self._cover = None
         self._user = {"pull": None, "owned": None, "read": None}
@@ -52,11 +62,18 @@ class Series:
         return self._series_id
 
     @property
-    def issues(self) -> list:
+    def issues(self) -> list[Issue]:
         """List of issues of the series"""
         if self._issues is None:
             self._get_data()
         return self._issues
+
+    @property
+    def trade_paperbacks(self) -> list[Trade_Paperback]:
+        """List of trade paperbacks of the series"""
+        if self._trade_paperbacks is None:
+            self._get_data()
+        return self._trade_paperbacks
 
     @property
     def description(self) -> str:
@@ -142,6 +159,17 @@ class Series:
     def issue_count(self, value):
         self._issue_count = value
 
+    @property
+    def trade_paperback_count(self) -> int:
+        """Number of trade paperbacks"""
+        if self._trade_paperback_count is None:
+            self._get_data()
+        return self._trade_paperback_count
+
+    @trade_paperback_count.setter
+    def trade_paperback_count(self, value):
+        self._trade_paperback_count = value
+
     def _get_data(self):
         """Get series info"""
         url = f"https://leagueofcomicgeeks.com/comic/get_comics?&list=search&view=thumbs&format[]=1&series_id={self._series_id}&character=0&order=date-desc"
@@ -200,6 +228,58 @@ class Series:
             }
             issues.append(i)
 
+        url = f"https://leagueofcomicgeeks.com/comic/get_comics?&list=search&view=thumbs&format[]=3&series_id={self._series_id}&character=0&order=date-desc"
+        r = self._session.get(url)
+        r.raise_for_status()
+        r = r.json()
+        if r["count"] == 0:
+            raise Exception("No series found")
+        soup = BeautifulSoup(r["list"], features="lxml")
+        content = soup.find(id="comic-list-issues")
+
+        trade_paperbacks = []
+        for issue in content.find_all("li"):
+            title = issue.find(class_="title").text.strip()
+            number = re.findall(r"\d+", title)
+            number = number[-1] if number else 1
+            issue_id = int(issue.find("a")["href"].split("/")[2])
+            i = Trade_Paperback(
+                issue_id=issue_id,
+                session=self._session,
+            )
+
+            i.name = title
+            i.url = url
+            i.store_date = issue.find(class_="date")["data-date"]
+            i.price = (
+                float(issue.find(class_="price").text.split("·")[1].strip()[1::])
+                if issue.find(class_="price")
+                else "Unknown"
+            )
+            i.publisher = r["series"]["publisher_name"]
+            i.cover = issue.find("img")["data-src"]
+            i.number = str(number) if number else ""
+            comic_controller = issue.findAll(class_="comic-controller")
+            i.user = {
+                "pull": True if "active" in comic_controller[0]["class"] else False,
+                "collect": True
+                if len(comic_controller) >= 2
+                and "active" in comic_controller[1]["class"]
+                else False,
+                "readlist": True
+                if len(comic_controller) >= 3
+                and "active" in comic_controller[2]["class"]
+                else False,
+                "wishlist": True
+                if len(comic_controller) >= 4
+                and "active" in comic_controller[3]["class"]
+                else False,
+                "rating": int(issue["data-rating"])
+                if "data-rating" in issue
+                else "Unknown",
+            }
+            trade_paperbacks.append(i)
+
         self._name = r["series"]["title"]
         self._publisher = r["series"]["publisher_name"]
         self._description = BeautifulSoup(
@@ -207,8 +287,10 @@ class Series:
         ).text
         self._start_year = int(begin.strip()) if begin else 0
         self._end_year = int(end.strip()) if end and end.strip() != "Present" else 0
-        self._issues = sorted(issues, key=lambda x: int(x.number))
+        self._issues = sorted(issues, key=lambda x: float(x.number))
         self._issue_count = len(issues)
+        self._trade_paperbacks = sorted(trade_paperbacks, key=lambda x: float(x.number))
+        self._trade_paperback_count = len(trade_paperbacks)
         self._url = header.find(class_="dropdown-item")["href"].split(
             "/submit-new-issue"
         )[0]
@@ -483,6 +565,8 @@ class Series:
             "end_year": self.end_year,
             "issues": self.issues,
             "issue_count": self.issue_count,
+            "trade_paperbacks": self.trade_paperbacks,
+            "trade_paperback_count": self.trade_paperback_count,
             "url": self.url,
             "cover": self.cover,
             "user": self.user,
@@ -725,7 +809,6 @@ class Issue:
 
     def _get_data(self):
         """Get series info"""
-
         url = f"https://leagueofcomicgeeks.com/comic/{self.issue_id}/foo"
         r = self._session.get(url)
         r.raise_for_status()
@@ -822,6 +905,8 @@ class Issue:
 
         title = soup.find("h1").text.strip()
         name, number, volume = extract(title)
+        if type(self).__name__ == "Trade_Paperback":
+            number = re.findall(r"\d+", title)[0]
 
         description: BeautifulSoup = comic.find(class_="listing-description")
         if description.find("h3"):
@@ -895,6 +980,16 @@ class Issue:
                 if rate and "data-rateit-value" in rate
                 else "Unknown"
             )
+        if type(self).__name__ == "Trade_Paperback":
+            collects = soup.find("section", id="collected-issues-list")
+            if collects:
+                collects = collects.find_all("li")
+                self._collects = [
+                    Issue(i.find("a")["href"].split("/")[2], self._session)
+                    for i in collects
+                ]
+            else:
+                self._collects = []
 
     def pull(self) -> dict:
         """Pull issue
@@ -1020,7 +1115,7 @@ class Issue:
 
     def json(self) -> dict:
         """Return data in json format"""
-        return {
+        r = {
             "issue_id": self.issue_id,
             "characters": self.characters,
             "cover": self.cover,
@@ -1038,6 +1133,22 @@ class Issue:
             "variant_covers": self.variant_covers,
             "user": self.user,
         }
+        if type(self).__name__ == "Trade_Paperback":
+            r["collects"] = self.collects
+        return r
+
+
+class Trade_Paperback(Issue):
+    def __init__(self, issue_id: int, session: requests.Session):
+        super().__init__(issue_id, session)
+        self._collects = None
+
+    @property
+    def collects(self) -> list[Issue]:
+        """Number of issues made by this creator"""
+        if self._collects is None:
+            self._get_data()
+        return self._collects
 
 
 class Creator:

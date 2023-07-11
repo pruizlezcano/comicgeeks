@@ -40,6 +40,8 @@ def test_get_series_by_id():
     assert data["end_year"] == 2021
     assert len(data["issues"]) == 5
     assert data["issue_count"] == 5
+    assert len(data["trade_paperbacks"]) == 1
+    assert data["trade_paperback_count"] == 1
     assert data["url"] == "/comics/series/150065/beta-ray-bill"
     assert data["cover"] != "#"
     user = data["user"]

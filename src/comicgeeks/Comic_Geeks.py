@@ -1,10 +1,11 @@
 from datetime import datetime
+from typing import Union
 
 import requests
 from bs4 import BeautifulSoup
 
-from comicgeeks.classes import Character, Creator, Issue, Series
-from comicgeeks.utils import get_series
+from comicgeeks.classes import Character, Creator, Issue, Series, Trade_Paperback
+from comicgeeks.utils import get_series, is_trade_paperback
 
 
 class Comic_Geeks:
@@ -207,15 +208,17 @@ class Comic_Geeks:
         """
         return Series(series_id, self._session)
 
-    def issue_info(self, issue_id: int) -> Issue:
+    def issue_info(self, issue_id: int) -> Union[Issue, Trade_Paperback]:
         """Get issue info by id
 
         Args:
             issue_id (int): issue id
 
         Returns:
-            Issue: Issue object
+            Issue | Trade_Paperback: Issue object
         """
+        if is_trade_paperback(issue_id):
+            return Trade_Paperback(issue_id, self._session)
         return Issue(issue_id, self._session)
 
     def creator_info(self, creator_id: int) -> Creator:
