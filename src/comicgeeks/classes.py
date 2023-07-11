@@ -1143,7 +1143,7 @@ class Trade_Paperback(Issue):
 
     @property
     def collects(self) -> list[Issue]:
-        """Number of issues made by this creator"""
+        """List of issues collected in this trade paperback"""
         if self._collects is None:
             self._get_data()
         return self._collects

@@ -11,7 +11,7 @@ comic_geeks = Comic_Geeks()
 series = comic_geeks.search_series("Daredevil")
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
   .. code-block:: none
 
@@ -29,7 +29,7 @@ series = comic_geeks.search_series("Daredevil")
       94 more...
     ]
 
-```
+````
 
 ### Search creator
 
@@ -40,7 +40,7 @@ client = Comic_Geeks()
 creators = client.search_creator("Chip")
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
    .. code-block:: none
 
@@ -57,9 +57,10 @@ creators = client.search_creator("Chip")
       <Series object at 0x00000...>,
       94 more...
     ]
-```
+````
 
 ### Search character
+
 ```python
 from comicgeeks import Comic_Geeks
 
@@ -67,7 +68,7 @@ client = Comic_Geeks()
 characters = client.search_character("Spider-man")
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
    .. code-block:: none
 
@@ -84,7 +85,7 @@ characters = client.search_character("Spider-man")
       <Character object at 0x00000...>,
       40 more...
     ]
-```
+````
 
 ### Get new releases
 
@@ -95,7 +96,7 @@ client = Comic_Geeks()
 issues = client.new_releases()
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
    .. code-block:: none
 
@@ -112,7 +113,7 @@ issues = client.new_releases()
       <Issue object at 0x00000...>,
       73 more...
     ]
-```
+````
 
 ## Get by id
 
@@ -125,7 +126,7 @@ client = Comic_Geeks()
 series = client.series_info(150065)
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
    .. code-block:: json
 
@@ -144,6 +145,10 @@ series = client.series_info(150065)
           "<Issue object at 0x00000..>"
       ],
       "issue_count": 5,
+      "trade_paperbacks": [
+          "<Trade_Paperback object at 0x00000..>",
+      ],
+      "trade_paperback_count": 1,
       "url": "/comics/series/150065/beta-ray-bill",
       "cover": "https://s3.amazonaws.com/comicgeeks/series/150065.jpg?1619183332",
       "user": { // Only valid if ci_session is provided
@@ -152,7 +157,7 @@ series = client.series_info(150065)
         "read": "None"
       }
     }
-```
+````
 
 ### Get issue
 
@@ -163,7 +168,7 @@ client = Comic_Geeks()
 issue = client.issue_info(3616996)
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
    .. code-block:: json
 
@@ -282,7 +287,7 @@ issue = client.issue_info(3616996)
         "rating": "None"
       }
     }
-```
+````
 
 ### Get creator
 
@@ -293,7 +298,7 @@ client = Comic_Geeks()
 creator = client.creator_info(6209)
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
    .. code-block:: json
 
@@ -322,9 +327,10 @@ creator = client.creator_info(6209)
       "owned": "None", // Only valid if ci_session is provided
       "issue_count": 378
     }
-```
+````
 
 ### Get character
+
 ```python
 from comicgeeks import Comic_Geeks
 
@@ -332,7 +338,7 @@ client = Comic_Geeks()
 character = client.creator_info(6209)
 ```
 
-```{admonition} Return
+````{admonition} Return
 ```{eval-rst}
   .. code-block:: json
 
@@ -375,4 +381,4 @@ character = client.creator_info(6209)
       "owned": "None", // Only valid if ci_session is provided
       "issue_count": 37
     }
-```
+````

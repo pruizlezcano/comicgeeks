@@ -18,6 +18,14 @@ Issue
    :no-undoc-members:
    :show-inheritance:
 
+Trade Paperback
+================
+
+.. autoclass:: comicgeeks.classes.Trade_Paperback
+   :members:
+   :no-undoc-members:
+   :show-inheritance:
+
 Series
 =======
 
