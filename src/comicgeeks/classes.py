@@ -909,10 +909,8 @@ class Issue:
             number = re.findall(r"\d+", title)[0]
 
         description: BeautifulSoup = comic.find(class_="listing-description")
-        if description.find("h3"):
-            name: str = description.find("h3").text.strip()
-        elif description.find("h4"):
-            name: str = description.find("h4").text.strip()
+        if comic.find(class_="story-title"):
+            name: str = comic.find(class_="story-title").text.strip()
         else:
             name: str = title
         self._name = name.title()
