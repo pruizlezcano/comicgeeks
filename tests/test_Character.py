@@ -5,6 +5,14 @@ from pathlib import Path
 
 dotenv_path = Path(".devdata.env")
 env = dotenv_values(dotenv_path=dotenv_path)
+if "LCG_CI_SESSION" not in env:
+    import os
+
+    env = {
+        "LCG_CI_SESSION": os.environ.get("LCG_CI_SESSION"),
+        "LCG_USERNAME": os.environ.get("LCG_USERNAME"),
+        "LCG_PASSWORD": os.environ.get("LCG_PASSWORD"),
+    }
 
 __author__ = "Pablo Ruiz"
 __copyright__ = "Pablo Ruiz"

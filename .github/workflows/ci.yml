@@ -67,9 +67,9 @@ jobs:
         with: {name: python-distribution-files, path: dist/}
       - name: Run tests
         env:
-          CI_SESSION: ${{ secrets.LCG_CI_SESSION }}
-          USERNAME: ${{ secrets.LCG_USERNAME }}
-          PASSWORD: ${{ secrets.LCG_PASSWORD }}
+          LCG_CI_SESSION: ${{ secrets.LCG_CI_SESSION }}
+          LCG_USERNAME: ${{ secrets.LCG_USERNAME }}
+          LCG_PASSWORD: ${{ secrets.LCG_PASSWORD }}
         run: >-
           pipx run tox
           --installpkg '${{ needs.prepare.outputs.wheel-distribution }}'
