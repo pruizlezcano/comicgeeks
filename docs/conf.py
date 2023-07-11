@@ -8,8 +8,8 @@
 # serve to show the default.
 
 import os
-import shutil
 import sys
+import shutil
 
 # -- Path setup --------------------------------------------------------------
 
@@ -52,7 +52,7 @@ try:
 
     apidoc.main(args)
 except Exception as e:
-    print(f"Running `sphinx-apidoc` failed!\n{e}")
+    print("Running `sphinx-apidoc` failed!\n{}".format(e))
 
 # -- General configuration ---------------------------------------------------
 
@@ -72,7 +72,6 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
-    "revitron_sphinx_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -107,11 +106,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "comicgeeks"
-version = "0.2.3"
-release = "0.2.3"
 author = "Pablo Ruiz"
 copyright = '2022 <a href="https://github.com/pruizlezcano">Pablo Ruiz</a>'
-language = "en"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -121,14 +117,10 @@ language = "en"
 # release: The full version, including alpha/beta/rc tags.
 # If you don’t need the separation provided between version and release,
 # just set them both to the same value.
-
 try:
     from comicgeeks import __version__ as version
-
-    version = version.__version__
 except ImportError:
     version = ""
-
 
 if not version or version.lower() == "unknown":
     version = os.getenv("READTHEDOCS_VERSION", "unknown")  # automatically set by RTD
@@ -211,7 +203,8 @@ html_context = {
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
 
-# The name of an image file (relative to this directory)
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
 html_logo = "_static/icon.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
@@ -288,7 +281,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ("index", "user_guide.tex", "comicgeeks Documentation", "Pablo", "manual")
+    ("index", "user_guide.tex", "comicgeeks Documentation", "Pablo Ruiz", "manual")
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
