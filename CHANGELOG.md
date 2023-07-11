@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.3.0 (2023-07-11)
+
+### Features
+
+- login with user and password ([422d044](https://github.com/pruizlezcano/comicgeeks/commit/422d04426e198f9c691c0443cb0f1d48f7a54602))
+- added TradePaperback class ([3620470](https://github.com/pruizlezcano/comicgeeks/commit/3620470d4e3f1a0bd12193f3bdb038e37261f02c))
+- added github actions ([46f4639](https://github.com/pruizlezcano/comicgeeks/commit/46f46396df44ad949f51bab1731bea67bba01705))
+
+### Fixes
+
+- new issue name location ([f837c74](https://github.com/pruizlezcano/comicgeeks/commit/f837c74eb03096d1e3ddc4adf92571543f685862))
+- module export ([9981d02](https://github.com/pruizlezcano/comicgeeks/commit/9981d02557704b124c3e9e580e97a22a46691139))
+
+### Tests
+
+- update for the new session system ([17bacc7](https://github.com/pruizlezcano/comicgeeks/commit/17bacc74000bb1e1a095138f773202b4af4bcd1c))
+- fixed github actions secrets ([2f8ce3c](https://github.com/pruizlezcano/comicgeeks/commit/2f8ce3c54926bb78ccde8eef4bd23693098d9e6c), [8b95823](https://github.com/pruizlezcano/comicgeeks/commit/8b95823705eb42db82268f6c6d48d53318fe4bf6), [8db643d](https://github.com/pruizlezcano/comicgeeks/commit/8db643d334237aab4d1a58e49713a2b6e2aa73e5))
+
+### Refactors
+
+- share client session for all classes ([c6c174b](https://github.com/pruizlezcano/comicgeeks/commit/c6c174bf8a9ca32b82d45e9057a279aa85b9b650))
+
+### Documentation
+
+- added login method and Trade_Paperback class ([40c4094]())
+
 ## 0.2.3 (2023-04-08)
 
 ### Fixes
