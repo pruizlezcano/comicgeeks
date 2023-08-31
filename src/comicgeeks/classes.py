@@ -7,8 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from comicgeeks.extract import extract
-from comicgeeks.utils import get_characters, get_series
-
+from comicgeeks.utils import get_characters, get_series, randomword
 
 class Issue:
     None
@@ -809,7 +808,7 @@ class Issue:
 
     def _get_data(self):
         """Get series info"""
-        url = f"https://leagueofcomicgeeks.com/comic/{self.issue_id}/foo"
+        url = f"https://leagueofcomicgeeks.com/comic/{self.issue_id}/{randomword(10)}"
         r = self._session.get(url)
         r.raise_for_status()
         soup = BeautifulSoup(r.content, features="lxml")
@@ -1248,7 +1247,7 @@ class Creator:
         self._url = value
 
     def _get_data(self):
-        url = f"https://leagueofcomicgeeks.com/people/{self.creator_id}/foo"
+        url = f"https://leagueofcomicgeeks.com/people/{self.creator_id}/{randomword(10)}"
         r = self._session.get(url)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
@@ -1466,7 +1465,7 @@ class Character:
         return self._character_id
 
     def _get_data(self):
-        url = f"https://leagueofcomicgeeks.com/character/{self.character_id}/foo"
+        url = f"https://leagueofcomicgeeks.com/character/{self.character_id}/{randomword(10)}"
         r = self._session.get(url)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"

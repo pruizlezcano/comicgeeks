@@ -1,4 +1,6 @@
 import requests
+import random
+import string
 
 
 def get_characters(content, Character, session: requests.Session):
@@ -40,6 +42,10 @@ def get_series(content, Series, session: requests.Session):
 
 
 def is_trade_paperback(issue_id: int):
-    url = f"https://leagueofcomicgeeks.com/comic/{issue_id}/foo"
+    url = f"https://leagueofcomicgeeks.com/comic/{issue_id}/{randomword(10)}"
     r = requests.get(url)
     return r.url[-3:] == "-tp"
+
+def randomword(length):
+   letters = string.ascii_lowercase
+   return ''.join(random.choice(letters) for i in range(length))
