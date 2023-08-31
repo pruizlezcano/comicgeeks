@@ -67,10 +67,7 @@ def test_get_trade_paperback_by_id():
         "isbn": "9781302932510",
         "distributor_sku": "apr230936",
     }
-    assert (
-        data["name"]
-        == "Daredevil & Elektra By Chip Zdarsky Vol. 2: The Red Fist Saga Part Two Tp"
-    )
+    assert data["name"] == "The Red Fist Saga Part Two"
     assert data["number"] == "2"
     assert len(data["person_credits"]) > 0
     assert data["price"] == 15.99
