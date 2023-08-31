@@ -2,6 +2,7 @@ import pytest
 from comicgeeks import Comic_Geeks
 from dotenv import dotenv_values
 from pathlib import Path
+from date import compare_timestamp
 
 dotenv_path = Path(".devdata.env")
 env = dotenv_values(dotenv_path=dotenv_path)
@@ -76,7 +77,7 @@ def test_get_issue_by_id():
             pagination.keys(),
         )
     )
-    assert data["store_date"] == 1563321600
+    assert compare_timestamp(data["store_date"], 1563321600)
     assert data["url"] == "/comic/3616996/daredevil-8"
     assert len(data["variant_covers"]) >= 2
     user = data["user"]

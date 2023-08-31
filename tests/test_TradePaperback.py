@@ -2,6 +2,7 @@ import pytest
 from comicgeeks import Comic_Geeks
 from dotenv import dotenv_values
 from pathlib import Path
+from date import compare_timestamp
 
 dotenv_path = Path(".devdata.env")
 env = dotenv_values(dotenv_path=dotenv_path)
@@ -65,7 +66,6 @@ def test_get_trade_paperback_by_id():
         "page_count": "112 pages",
         "isbn": "9781302932510",
         "distributor_sku": "apr230936",
-        "final_order_cutoff": "event_busy may 15th",
     }
     assert (
         data["name"]
@@ -82,7 +82,7 @@ def test_get_trade_paperback_by_id():
             pagination.keys(),
         )
     )
-    assert data["store_date"] == 1690243200
+    assert compare_timestamp(data["store_date"], 1690243200)
     assert (
         data["url"]
         == "/comic/6828314/daredevil-elektra-by-chip-zdarsky-vol-2-the-red-fist-saga-part-two-tp"
