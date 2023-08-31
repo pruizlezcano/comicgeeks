@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.1 (2023-08-31)
+
+### Fixes
+
+- url error when getting data ([39b9d62](https://github.com/pruizlezcano/comicgeeks/commit/39b9d629a66c49dc1b8ffdef8ef805e7f855c231))
+- error getting trade paperback name ([1c37d74](https://github.com/pruizlezcano/comicgeeks/commit/1c37d74da6179e19c7a387e79867bc872dd05f82))
+
+### Tests
+
+- compare timestamps from different timezones ([4009fd1](https://github.com/pruizlezcano/comicgeeks/commit/4009fd189aa1e4807344b3f4d5065d430d46b589))
+- pass test variables ([84a9db4](https://github.com/pruizlezcano/comicgeeks/commit/84a9db4b2607f0a52dbb35d7b35502fadfde120d))
+
 ## 0.3.0 (2023-07-11)
 
 ### Features
