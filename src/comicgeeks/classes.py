@@ -912,6 +912,10 @@ class Issue:
             name: str = comic.find(class_="story-title").text.strip()
         else:
             name: str = title
+        if type(self).__name__ == "Trade_Paperback":
+            name = title.split(":")[1] if ":" in title else title
+            name = name.replace("TP", "").strip()
+
         self._name = name.title()
         self._number = str(number) if number else ""
         self._publisher = soup.find(class_="header-intro").find("a").text.strip()
@@ -1247,7 +1251,9 @@ class Creator:
         self._url = value
 
     def _get_data(self):
-        url = f"https://leagueofcomicgeeks.com/people/{self.creator_id}/{randomword(10)}"
+        url = (
+            f"https://leagueofcomicgeeks.com/people/{self.creator_id}/{randomword(10)}"
+        )
         r = self._session.get(url)
         r.raise_for_status()
         comics_url = f"{r.url}/comics"
