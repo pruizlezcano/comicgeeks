@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from comicgeeks.extract import extract
 from comicgeeks.utils import get_characters, get_series, randomword
 
+
 class Issue:
     None
 
@@ -231,53 +232,52 @@ class Series:
         r = self._session.get(url)
         r.raise_for_status()
         r = r.json()
-        if r["count"] == 0:
-            raise Exception("No series found")
-        soup = BeautifulSoup(r["list"], features="lxml")
-        content = soup.find(id="comic-list-issues")
-
         trade_paperbacks = []
-        for issue in content.find_all("li"):
-            title = issue.find(class_="title").text.strip()
-            number = re.findall(r"\d+", title)
-            number = number[-1] if number else 1
-            issue_id = int(issue.find("a")["href"].split("/")[2])
-            i = Trade_Paperback(
-                issue_id=issue_id,
-                session=self._session,
-            )
+        if r["count"] > 0:
+            soup = BeautifulSoup(r["list"], features="lxml")
+            content = soup.find(id="comic-list-issues")
 
-            i.name = title
-            i.url = url
-            i.store_date = issue.find(class_="date")["data-date"]
-            i.price = (
-                float(issue.find(class_="price").text.split("·")[1].strip()[1::])
-                if issue.find(class_="price")
-                else "Unknown"
-            )
-            i.publisher = r["series"]["publisher_name"]
-            i.cover = issue.find("img")["data-src"]
-            i.number = str(number) if number else ""
-            comic_controller = issue.findAll(class_="comic-controller")
-            i.user = {
-                "pull": True if "active" in comic_controller[0]["class"] else False,
-                "collect": True
-                if len(comic_controller) >= 2
-                and "active" in comic_controller[1]["class"]
-                else False,
-                "readlist": True
-                if len(comic_controller) >= 3
-                and "active" in comic_controller[2]["class"]
-                else False,
-                "wishlist": True
-                if len(comic_controller) >= 4
-                and "active" in comic_controller[3]["class"]
-                else False,
-                "rating": int(issue["data-rating"])
-                if "data-rating" in issue
-                else "Unknown",
-            }
-            trade_paperbacks.append(i)
+            for issue in content.find_all("li"):
+                title = issue.find(class_="title").text.strip()
+                number = re.findall(r"\d+", title)
+                number = number[-1] if number else 1
+                issue_id = int(issue.find("a")["href"].split("/")[2])
+                i = Trade_Paperback(
+                    issue_id=issue_id,
+                    session=self._session,
+                )
+
+                i.name = title
+                i.url = url
+                i.store_date = issue.find(class_="date")["data-date"]
+                i.price = (
+                    float(issue.find(class_="price").text.split("·")[1].strip()[1::])
+                    if issue.find(class_="price")
+                    else "Unknown"
+                )
+                i.publisher = r["series"]["publisher_name"]
+                i.cover = issue.find("img")["data-src"]
+                i.number = str(number) if number else ""
+                comic_controller = issue.findAll(class_="comic-controller")
+                i.user = {
+                    "pull": True if "active" in comic_controller[0]["class"] else False,
+                    "collect": True
+                    if len(comic_controller) >= 2
+                    and "active" in comic_controller[1]["class"]
+                    else False,
+                    "readlist": True
+                    if len(comic_controller) >= 3
+                    and "active" in comic_controller[2]["class"]
+                    else False,
+                    "wishlist": True
+                    if len(comic_controller) >= 4
+                    and "active" in comic_controller[3]["class"]
+                    else False,
+                    "rating": int(issue["data-rating"])
+                    if "data-rating" in issue
+                    else "Unknown",
+                }
+                trade_paperbacks.append(i)
 
         self._name = r["series"]["title"]
         self._publisher = r["series"]["publisher_name"]
