@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 (2023-09-01)
+
+## Fixes
+
+- **Issue:** error when series doesn't have any trade paperback ([8bbd122](https://github.com/pruizlezcano/comicgeeks/commit/8bbd1223a5b803e4a3dfbac013e1fdaf8bbdc1a9))
+
 ## 0.3.1 (2023-08-31)
 
 ### Fixes
