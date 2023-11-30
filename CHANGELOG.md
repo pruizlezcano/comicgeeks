@@ -1,8 +1,12 @@
-# Changelog
+## [v0.3.3](https://github.com/pruizlezcano/comicgeeks/compare/v0.3.2...v0.3.3) (2023-11-30)
+
+### Bug Fixes
+
+- **Issue**: Fixed new location for price and page values ([6203375](https://github.com/pruizlezcano/comicgeeks/commit/62033753d8796ce451632b9704434839b7b6b4ab))
 
 ## 0.3.2 (2023-09-01)
 
-## Fixes
+### Fixes
 
 - **Issue:** error when series doesn't have any trade paperback ([8bbd122](https://github.com/pruizlezcano/comicgeeks/commit/8bbd1223a5b803e4a3dfbac013e1fdaf8bbdc1a9))
 
