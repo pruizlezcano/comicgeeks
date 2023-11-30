@@ -3,6 +3,7 @@
 
 import datetime
 import re
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -821,14 +822,17 @@ class Issue:
             )
         )
         comic = soup.find(id="comic-details")
-        details = comic.find(id="summary").find_all(class_="row")[-1]
+        summary = comic.find(id="summary")
+        details = summary.find_all(class_="row")[-1]
         d = {}
         for detail in details.find_all(class_="details-addtl-block"):
             d[detail.find(class_="name").text.strip().lower().replace(" ", "_")] = (
                 detail.find(class_="value").text.strip().lower()
             )
-        price = d.pop("cover_price") if "cover_price" in d else "Unknown"
-        price = float(price[1::]) if price != "Unknown" else price
+        info = summary.find_all(class_="col")[-1].text.split("·")
+        price = float(info[-1].strip()[1::]) if "$" in info[-1] else "Unknown"
+        d["format"] = info[0].strip().lower()
+        d["page_count"] = info[1].strip()
 
         creators = comic.find(id="creators")
         person_credits = []

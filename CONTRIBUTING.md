@@ -162,9 +162,12 @@ conda activate comicgeeks
 
    (after having installed [tox] with `pip install tox` or `pipx`).
 
-   To run all the tests, create a file in the root directory of the project with the name `.devdata.env` and add your [leagueofcomicgeeks.com] ci_session to it:
+   To run all the tests, create a file in the root directory of the project with the name `.devdata.env` and add your [leagueofcomicgeeks.com] user to it:
    ```
-   CI_SESSION="mycisession"
+   LCG_CI_SESSION=123asd...
+   LCG_USERNAME=itsme
+   LCG_PASSWORD=supersecret
+
    ```
 
    You can also use [tox] to run several other pre-configured tasks in the
