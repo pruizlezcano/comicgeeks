@@ -866,6 +866,7 @@ class Issue:
         if variant_covers:
             for variant in variant_covers.find_all(class_="text-center"):
                 img = variant.find("img")
+                img = img.attrs if img else {}
                 covers.append(
                     {
                         "name": img["alt"],
