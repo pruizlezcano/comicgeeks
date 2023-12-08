@@ -1,8 +1,14 @@
+## [v0.3.4](git@github.com:pruizlezcano/comicgeeks/compare/v0.3.3...v0.3.4) (2023-12-08)
+
+### Bug Fixes
+
+- **Issue**: Fixed missing image attribute in variant covers [[#4](https://github.com/pruizlezcano/comicgeeks/issues/4)] ([793f0b5](git@github.com:pruizlezcano/comicgeeks/commit/793f0b5a116a7047f8c3319c03e7842d2cbc0342))
+
 ## [v0.3.3](https://github.com/pruizlezcano/comicgeeks/compare/v0.3.2...v0.3.3) (2023-11-30)
 
 ### Bug Fixes
 
-- **Issue**: Fixed new location for price and page values ([6203375](https://github.com/pruizlezcano/comicgeeks/commit/62033753d8796ce451632b9704434839b7b6b4ab))
+- **Issue**: Fixed new location for price and page values [[#3](https://github.com/pruizlezcano/comicgeeks/issues/3)] ([6203375](https://github.com/pruizlezcano/comicgeeks/commit/62033753d8796ce451632b9704434839b7b6b4ab))
 
 ## 0.3.2 (2023-09-01)
 
