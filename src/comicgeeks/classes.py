@@ -987,15 +987,14 @@ class Issue:
                 else "Unknown"
             )
         if type(self).__name__ == "Trade_Paperback":
-            collects = soup.find("section", id="collected-issues-list")
+            collects = soup.find("section", id="stories")
+            self._collects = []
             if collects:
-                collects = collects.find_all("li")
-                self._collects = [
-                    Issue(i.find("a")["href"].split("/")[2], self._session)
-                    for i in collects
-                ]
-            else:
-                self._collects = []
+                collects = collects.find_all("details")[1:]
+                for i in collects:
+                    issue = Issue(i.find("a")["href"].split("/")[2], self._session)
+                    issue.name = i.find("h4").text.strip()
+                    self._collects.append(issue)
 
     def pull(self) -> dict:
         """Pull issue
