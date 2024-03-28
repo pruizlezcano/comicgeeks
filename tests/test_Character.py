@@ -1,18 +1,11 @@
-import pytest
-from comicgeeks import Comic_Geeks
-from dotenv import dotenv_values
 from pathlib import Path
 
-dotenv_path = Path(".devdata.env")
-env = dotenv_values(dotenv_path=dotenv_path)
-if "LCG_CI_SESSION" not in env:
-    import os
+import pytest
+from load_env import load_env
 
-    env = {
-        "LCG_CI_SESSION": os.environ.get("LCG_CI_SESSION"),
-        "LCG_USERNAME": os.environ.get("LCG_USERNAME"),
-        "LCG_PASSWORD": os.environ.get("LCG_PASSWORD"),
-    }
+from comicgeeks import Comic_Geeks
+
+env = load_env()
 
 __author__ = "Pablo Ruiz"
 __copyright__ = "Pablo Ruiz"
@@ -59,6 +52,8 @@ def test_get_character_by_id():
 def test_get_character_by_id_session():
     """Get character by id test"""
     client = Comic_Geeks(env["LCG_CI_SESSION"])
+    print(env)
+    assert env["LCG_CI_SESSION"] is not None
     data = client.character_info(11699)
     assert data.owned is not None
     assert data.read is not None
