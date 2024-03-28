@@ -1,19 +1,12 @@
-import pytest
-from comicgeeks import Comic_Geeks
-from dotenv import dotenv_values
 from pathlib import Path
+
+import pytest
 from date import compare_timestamp
+from load_env import load_env
 
-dotenv_path = Path(".devdata.env")
-env = dotenv_values(dotenv_path=dotenv_path)
-if "LCG_CI_SESSION" not in env:
-    import os
+from comicgeeks import Comic_Geeks
 
-    env = {
-        "LCG_CI_SESSION": os.environ.get("LCG_CI_SESSION"),
-        "LCG_USERNAME": os.environ.get("LCG_USERNAME"),
-        "LCG_PASSWORD": os.environ.get("LCG_PASSWORD"),
-    }
+env = load_env()
 
 __author__ = "Pablo Ruiz"
 __copyright__ = "Pablo Ruiz"

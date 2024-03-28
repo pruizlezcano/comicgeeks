@@ -164,7 +164,6 @@ conda activate comicgeeks
 
    To run all the tests, create a file in the root directory of the project with the name `.devdata.env` and add your [leagueofcomicgeeks.com] user to it:
    ```
-   LCG_CI_SESSION=123asd...
    LCG_USERNAME=itsme
    LCG_PASSWORD=supersecret
 
