@@ -3,12 +3,13 @@
 
 import datetime
 import re
+from urllib.parse import parse_qs, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
 from comicgeeks.extract import extract
-from comicgeeks.utils import get_characters, get_series, randomword
+from comicgeeks.utils import get_characters, get_creators, get_series, randomword
 
 
 class Issue:
@@ -834,24 +835,18 @@ class Issue:
         d["format"] = info[0].strip().lower()
         d["page_count"] = info[1].strip()
 
-        creators = comic.find(id="creators")
+        stories = comic.find(id="stories")
+        creators = stories.find(id=re.compile(r"^creators"))
         person_credits = []
-        if creators:
-            creators = creators.find_all(class_="row")[1].find_all(class_="row")
-            for creator in creators:
-                creator_url = creator.find("a")["href"]
-                creator_id = creator_url.split("/")[2]
-                c = Creator(creator_id, self._session)
-                c.url = creator_url
-                c.name = creator.find(class_="name").text.strip()
-                person_credits.append(
-                    {
-                        "role": creator.find(class_="role").text.strip().lower(),
-                        "Creator": c,
-                    }
-                )
+        person_credits += get_creators(creators, Creator, self._session)
 
-        characters = comic.find(id="characters")
+        cover_artists = stories.find(id="cover-artists")
+        person_credits += get_creators(cover_artists, Creator, self._session)
+
+        credits_production = stories.find(id="credits-production")
+        person_credits += get_creators(credits_production, Creator, self._session)
+
+        characters = stories.find(id=re.compile(r"^characters"))
         characters_credits = get_characters(characters, Character, self._session)
 
         covers = []
